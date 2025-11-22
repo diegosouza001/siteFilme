@@ -39,13 +39,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-950 via-gray-900 to-black text-white flex flex-col items-center p-10 font-sans">
       <header className="text-center mb-10">
-        <h1 className="text-6xl font-extrabold text-purple-400 drop-shadow-2xl mb-4">🎬 Movie Genius</h1>
-        <p className="text-gray-300 text-lg">Busque filmes e converse com a IA sobre eles!</p>
+        <h1 className="tituloPrincipal">🎬 Movie Genius</h1>
+        <p className="tituloSecundario">Busque filmes e converse com a IA sobre eles!</p>
       </header>
 
       {/* Busca */}
-      <div className="bg-gradient-to-r from-purple-800 via-gray-800 to-purple-700 p-8 rounded-3xl shadow-2xl w-full max-w-2xl mb-10 border border-gray-600">
-        <h2 className="text-3xl font-semibold mb-5 text-purple-200">Buscar Filme</h2>
+      <div className="bg-gradient-to-r from-purple-800 via-gray-800 to-purple-700 p-8 rounded-3xl shadow-2xl w-full max-w-2xl mb-10 border border-gray-600 flex gap-4 justify-center">
+        <h2 className="buscarFilmeLabel">Buscar Filme</h2>
         <div className="flex gap-4">
           <input 
             type="text"
@@ -56,7 +56,7 @@ export default function App() {
           />
           <button
             onClick={buscarFilme}
-            className="px-6 py-4 bg-purple-500 hover:bg-purple-600 active:scale-95 rounded-2xl transition font-bold shadow-lg text-lg"
+            className="buttonBuscar"
           >
             Buscar
           </button>
