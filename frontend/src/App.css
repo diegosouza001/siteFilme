@@ -170,6 +170,25 @@ body {
   display: flex;
 }
 
+.historico-filmes {
+  display: flex;
+  margin: 10px;
+  flex-wrap: wrap;
+}
+
+.historico-filmes img {
+  margin: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.75rem;
+  transition: transform 0.2s;
+}
+
+.historico-filmes img:hover {
+  transform: scale(1.05); /* efeito hover */
+}
+
+
+
 .buttonIA {
   width: 100px;
   display: flex;

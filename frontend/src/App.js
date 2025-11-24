@@ -10,7 +10,9 @@ export default function App() {
   const [loadingIa, setLoadingIa] = useState(false);
 
   const [abrirModal, setAbrirModal] = useState(false);
+  const [historico, setHistorico] = useState([]);
 
+  // Buscar filme
   async function buscarFilme() {
     if (!titulo) return;
     setLoadingFilme(true);
@@ -22,11 +24,19 @@ export default function App() {
     const data = await resp.json();
     setFilme(data);
 
-    // Abre automaticamente o modal
+    // Abrir modal automaticamente
     setAbrirModal(true);
+
+    // Adicionar ao histórico (sem duplicar)
+    setHistorico((prev) => {
+      if (prev.find((f) => f.id === data.id)) return prev; // não adiciona duplicado
+      return [data, ...prev];
+    });
+
     setLoadingFilme(false);
   }
 
+  // Perguntar à IA
   async function perguntarIa() {
     if (!filme || !pergunta) return;
     setLoadingIa(true);
@@ -42,6 +52,13 @@ export default function App() {
     setLoadingIa(false);
   }
 
+  // Fechar modal
+  const fecharModal = () => {
+    setAbrirModal(false);
+    setPergunta("");
+    setResposta("");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-950 via-gray-900 to-black text-white flex flex-col items-center p-10 font-sans">
 
@@ -51,16 +68,7 @@ export default function App() {
           <div className="modal-box flex flex-col md:flex-row gap-8">
 
             {/* Botão fechar */}
-            <button
-              onClick={() => {
-                setAbrirModal(false)
-                setPergunta("");
-                setResposta("");
-              }}
-              className="modal-close"
-            >
-              X
-            </button>
+            <button onClick={fecharModal} className="modal-close">X</button>
 
             {/* Coluna esquerda: Poster */}
             <img
@@ -74,20 +82,22 @@ export default function App() {
               <h2 className="modal-title">{filme.title}</h2>
               <p className="modal-text">{filme.overview}</p>
 
-              {/* Chat IA */}
-              <textarea
-                className="inputIA"
-                placeholder="Pergunte algo sobre o filme..."
-                value={pergunta}
-                onChange={(e) => setPergunta(e.target.value)}
-              />
-
-              <button
-                onClick={perguntarIa}
-                className="buttonIA"
-              >
-                Enviar
-              </button>
+              {/* Chat IA com botão ao lado */}
+              <div className="flex gap-4 items-start">
+                <textarea
+                  className="inputIA flex-1 resize-none"
+                  placeholder="Pergunte algo sobre o filme..."
+                  value={pergunta}
+                  onChange={(e) => setPergunta(e.target.value)}
+                  rows={3}
+                />
+                <button
+                  onClick={perguntarIa}
+                  className="buttonIA self-start"
+                >
+                  Enviar
+                </button>
+              </div>
 
               {loadingIa && (
                 <p className="text-purple-300 animate-pulse">⌛ Gerando resposta...</p>
@@ -96,7 +106,7 @@ export default function App() {
               {resposta && (
                 <div className="bg-gray-700 p-4 rounded-2xl shadow-inner border border-gray-600">
                   <h3 className="text-purple-300 font-bold mb-2">Resposta da IA:</h3>
-                  <p className="respostaIA">{resposta}</p>
+                  <p className="text-gray-200 whitespace-pre-line">{resposta}</p>
                 </div>
               )}
             </div>
@@ -105,7 +115,7 @@ export default function App() {
       )}
       {/* ====================== FIM MODAL ====================== */}
 
-      {/* Header e Busca */}
+      {/* Header */}
       <header className="text-center mb-10">
         <h1 className="tituloPrincipal">🎬 Movie Genius</h1>
         <p className="tituloSecundario">
@@ -124,18 +134,34 @@ export default function App() {
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
           />
-          <button onClick={buscarFilme} className="buttonBuscar">
-            Buscar
-          </button>
+          <button onClick={buscarFilme} className="buttonBuscar">Buscar</button>
         </div>
         {loadingFilme && (
-          <p className="mt-4 animate-pulse text-purple-300">
-            🔎 Buscando filme...
-          </p>
+          <p className="mt-4 animate-pulse text-purple-300">🔎 Buscando filme...</p>
         )}
       </div>
 
-      {/* Nenhum conteúdo do filme ou chat fora do modal */}
+      {/* ====================== HISTÓRICO ====================== */}
+      {historico.length > 0 && (
+        <div className="historico-filmes flex gap-4 flex-wrap mt-6">
+          {historico.map((f, index) => (
+            <img
+              key={index}
+              src={`https://image.tmdb.org/t/p/w200${f.poster_path}`}
+              alt={f.title}
+              className="rounded-xl cursor-pointer hover:scale-105 transition"
+              onClick={() => {
+                setFilme(f);
+                setAbrirModal(true);
+                setPergunta("");
+                setResposta("");
+              }}
+            />
+          ))}
+        </div>
+      )}
+      {/* ====================== FIM HISTÓRICO ====================== */}
+
     </div>
   );
 }
