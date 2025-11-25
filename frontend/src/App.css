@@ -1,86 +1,146 @@
-.App {
-  text-align: center;
-}
+/* ==================== LAYOUT PRINCIPAL ==================== */
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background-color: gray;
+  margin: 0;
+  padding: 0;
+  background: #111;
+  color: white;
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.tituloPrincipal {
+.tela-dividida {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ==================== PARTE SUPERIOR (tipo streaming) ==================== */
+
+.topo-streaming {
+  height: 60vh;
+  background: linear-gradient(to bottom, #000000, #1b0b28);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+
+  position: relative;
+  z-index: 1;
+}
+
+/* Títulos */
+.tituloPrincipal {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0;
 }
 
 .tituloSecundario {
-  display: flex;
-  justify-content: center;
+  margin-top: 5px;
+  opacity: 0.8;
 }
 
-.buttonBuscar {
-  margin: 10px;
-  width: 325px;;
-  padding: 15px;
-  margin-top: 1px;
-  border-radius: 5px;
-  display: block;
-  margin: 20px auto;
-}
+/* ==================== Caixa de Busca ==================== */
 
-.inputPrin {
-  padding: 15px;
-  margin: 0 auto;
-  width: 300px;
-  border-radius: 5px;
-  display: block;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1px;
+.box-busca {
+  background: #2a0a40;
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid #444;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 20px;
 }
 
 .buscarFilmeLabel {
-  margin: 10px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.inputPrin {
+  padding: 12px;
+  width: 260px;
+  border-radius: 8px;
+  border: none;
+  background: #eee;
+}
+
+.buttonBuscar {
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  background: purple;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.buttonBuscar:hover {
+  background: rgb(150, 0, 150);
+}
+
+/* ==================== CARROSSEL HISTÓRICO ==================== */
+
+.carrossel-filmes {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  overflow-x: auto;
+  width: 100%;
+  padding: 20px 0;
+  margin-top: 20px;
+}
+
+.carrossel-filmes::-webkit-scrollbar {
+  height: 8px;
+}
+
+.carrossel-filmes::-webkit-scrollbar-thumb {
+  background: purple;
+  border-radius: 10px;
+}
+
+.filme-card {
+  width: 160px;
+  height: 230px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.filme-card:hover {
+  transform: scale(1.07);
+}
+
+/* ==================== PARTE INFERIOR ==================== */
+
+.fundo-roxo {
+  height: 40vh;
+  background: #2a0a40;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
-.App-link {
-  color: #61dafb;
+.texto-roxo {
+  font-size: 32px;
+  font-weight: 700;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* ==================== MODAL ==================== */
 
-
-/* Fundo escuro */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -92,7 +152,6 @@ body {
   z-index: 999;
 }
 
-/* Caixa principal */
 .modal-box {
   background: #1f1f29;
   border: 1px solid #3f3f46;
@@ -103,34 +162,18 @@ body {
   display: flex;
   gap: 40px;
   position: relative;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-  animation: modalFade 0.3s ease-out;
+  animation: fadeModal 0.3s ease-out;
 }
 
-/* Poster no modal */
-.modal-poster {
-  width: 300px;
-  border-radius: 20px;
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
-  border: 1px solid #4b5563;
-}
-
-/* Título no modal */
-.modal-title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #d8b4fe;
-  margin-bottom: 20px;
-}
-
-/* Texto */
-.modal-text {
-  font-size: 1.2rem;
-  color: #e5e7eb;
-  line-height: 1.6rem;
-  max-height: 400px;
-  overflow-y: auto;
-  padding-right: 10px;
+@keyframes fadeModal {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Botão fechar */
@@ -144,59 +187,52 @@ body {
   font-weight: bold;
   border-radius: 10px;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 .modal-close:hover {
   background: #b91c1c;
 }
 
-/* Animação */
-@keyframes modalFade {
-  from {
-    transform: scale(0.85);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+/* Poster */
+.modal-poster {
+  width: 300px;
+  border-radius: 20px;
+  border: 1px solid #555;
 }
 
+/* Texto */
+.modal-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #d8b4fe;
+}
+
+.modal-text {
+  font-size: 1.2rem;
+  color: #e5e7eb;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+/* Caixa IA */
 .inputIA {
   width: 250px;
   padding: 8px;
-  border-radius: 5px;
-  display: flex;
+  border-radius: 8px;
+  border: none;
+  background: #eee;
 }
-
-.historico-filmes {
-  display: flex;
-  margin: 10px;
-  flex-wrap: wrap;
-}
-
-.historico-filmes img {
-  margin: 0.5rem;
-  cursor: pointer;
-  border-radius: 0.75rem;
-  transition: transform 0.2s;
-}
-
-.historico-filmes img:hover {
-  transform: scale(1.05); /* efeito hover */
-}
-
-
 
 .buttonIA {
-  width: 100px;
-  display: flex;
-  padding: 6px;
-  border-radius: 6px;
-  
+  padding: 8px 15px;
+  border-radius: 8px;
+  background: purple;
+  color: white;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
 }
 
-.respostaIA {
-  color: white;
+.buttonIA:hover {
+  background: rgb(160, 0, 160);
 }
