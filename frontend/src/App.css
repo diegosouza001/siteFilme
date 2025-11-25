@@ -58,7 +58,7 @@ body {
   padding: 20px;
   border-radius: 15px;
   border: 1px solid #444;
-  width: 100%;
+  width: 450px;
   max-width: 600px;
   margin-top: 20px;
 }
@@ -235,4 +235,33 @@ body {
 
 .buttonIA:hover {
   background: rgb(160, 0, 160);
+}
+
+.seta-esquerda,
+.seta-direita {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 45px;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.seta-esquerda:hover,
+.seta-direita:hover {
+  background: rgba(0,0,0,0.7);
+}
+
+.seta-esquerda {
+  left: 20px;
+}
+
+.seta-direita {
+  right: 20px;
 }
