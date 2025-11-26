@@ -13,6 +13,16 @@ const GROQ_KEY = process.env.GROQ_API_KEY;
 const JWT_SECRET = process.env.JWT_SECRET || "your-strong-jwt-secret-key"; 
 const POSTGRES_URL = process.env.POSTGRES_URL; 
 
+// NOVAS VARIAVEIS DE CONEXAO
+const PG_CONFIG = {
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT ? parseInt(process.env.PG_PORT) : 5432,
+  user: process.env.PG_USER,
+  password: process.env.PG_PASSWORD,
+  database: process.env.PG_DATABASE,
+};
+
+
 // ---------------------------
 // 1. CONFIGURAÇÃO DO BANCO DE DADOS
 // ---------------------------
@@ -20,13 +30,18 @@ const POSTGRES_URL = process.env.POSTGRES_URL;
 console.log("DEBUG: POSTGRES_URL sendo usada:", POSTGRES_URL ? "Definida" : "NÃO DEFINIDA"); 
 
 // Lógica de verificação para saber se a URL é local ou de produção
+// Usamos a POSTGRES_URL para detecção de localhost se ela estiver definida
 const isLocalhost = POSTGRES_URL && (POSTGRES_URL.includes("localhost") || POSTGRES_URL.includes("127.0.0.1"));
 
-const db = new Pool({
-  connectionString: POSTGRES_URL,
-  // Desativa o SSL se a conexão for local para evitar o erro "server does not support SSL"
-  ssl: isLocalhost ? false : { rejectUnauthorized: false } 
-});
+// Define as opções de conexão: prioriza POSTGRES_URL se definida, senão usa PG_CONFIG
+const connectionOptions = POSTGRES_URL 
+  ? { connectionString: POSTGRES_URL }
+  : PG_CONFIG;
+
+// Adiciona configuração SSL
+connectionOptions.ssl = isLocalhost ? false : { rejectUnauthorized: false };
+
+const db = new Pool(connectionOptions);
 
 // Função para garantir que a tabela de usuários existe
 async function ensureUsersTableExists() {
@@ -121,6 +136,8 @@ app.post("/auth/register", async (req, res) => {
     const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
 
     console.log(`DEBUG: Usuário ${user.nome} (${user.email}) registado com ID ${user.id}.`);
+    console.log("DEBUG: JWT gerada:", token); // <-- NOVO LOG AQUI
+
     // O frontend espera 'username', então mapeamos 'nome' para 'username' na resposta
     res.status(201).json({ token, username: user.nome, message: "Utilizador registado com sucesso." });
   } catch (err) {
@@ -154,6 +171,8 @@ app.post("/auth/login", async (req, res) => {
 
     // 3. Gerar JWT
     const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+    
+    console.log("DEBUG: JWT gerada:", token); // <-- NOVO LOG AQUI
 
     // O frontend espera 'username', então mapeamos 'nome' para 'username' na resposta
     res.json({ token, username: user.nome, message: "Login efetuado com sucesso." });
