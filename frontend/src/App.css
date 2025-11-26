@@ -352,3 +352,96 @@
         0%, 100% { opacity: 1; }
         50% { opacity: .5; }
       }
+      
+      .login-page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        gap: 12px;
+        text-align: center;
+        flex-direction: column;
+      }
+
+      .email-login {
+        margin: 10px;
+        width: 250px;
+        padding: 5px;
+        border-radius: 5px;
+      }
+
+      .password-login {
+        margin: 10px;
+        width: 250px;
+        padding: 5px;
+        border-radius: 5px;
+        margin-top: 1px;
+      }
+
+      .button-login {
+        margin: 11px;
+        width: 100px;
+        padding: 3px;
+        border-radius: 5px;
+      }
+
+      .button-redirecionar {
+        margin: 11px;
+        width: 120px;
+        padding: 3px;
+        border-radius: 5px;
+      }
+
+      .titulo-login{
+        margin: 10px;
+      }
+
+      .cadastro-page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        gap: 12px;
+        text-align: center;
+        flex-direction: column;
+      }
+
+      .email-cadastro {
+        margin: 10px;
+        width: 250px;
+        padding: 5px;
+        border-radius: 5px;
+        margin-top: 1px;
+      }
+
+      .senha-cadastro {
+        margin: 10px;
+        width: 250px;
+        padding: 5px;
+        border-radius: 5px;
+        margin-top: 1px;
+      }
+
+      .nome-cadastro {
+        margin: 10px;
+        width: 250px;
+        padding: 5px;
+        border-radius: 5px;
+        margin-top: 1px;
+      }
+
+      .button-cadastro {
+        margin: 11px;
+        width: 120px;
+        padding: 3px;
+        border-radius: 5px;
+        margin-right: 1px;
+      }
+
+      .button-cadastro-redirecionar {
+        margin: 11px;
+        width: 128px;
+        padding: 4px;
+        border-radius: 5px;
+      }
+      

@@ -43,7 +43,7 @@ connectionOptions.ssl = isLocalhost ? false : { rejectUnauthorized: false };
 
 const db = new Pool(connectionOptions);
 
-// Função para garantir que a tabela de usuários existe
+// Função para garantir que a tabela de usuários 
 async function ensureUsersTableExists() {
   try {
     // Tenta obter uma conexão simples para verificar se a Pool está funcionando
@@ -258,4 +258,6 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
 });
 
 // ---------------------------
+
+
 app.listen(3001, () => console.log("Backend a correr na porta 3001"));
