@@ -1,3 +1,6 @@
+      
+      
+      
       :root {
           --primary-color: #8b5cf6; /* Violet */
           --primary-hover: #7c3aed; 
@@ -15,6 +18,7 @@
           background-color: var(--bg-dark);
           color: var(--text-light);
           min-height: 100vh;
+          height: 100%;
       }
       
       /* =================== Estilos de Autenticação (Novo) =================== */
@@ -444,4 +448,38 @@
         padding: 4px;
         border-radius: 5px;
       }
-      
+
+      .cadastro-bg {
+        position: absolute;
+        inset: 0;
+        background-image: url("https://wallpapers.com/images/hd/american-movie-posters-z0puq43u0qbtr6j2.jpg");
+        background-size: cover;
+        background-position: center;
+     }
+
+     .form-cadastro {
+      background: rgb(28, 26, 26);
+      padding: 30px;
+      border-radius: 12px;
+      width: 350px;
+      margin: 180px auto 0;
+      color: white;
+  
+     }
+
+    .login-bg {
+      position: absolute;
+        inset: 0;
+        background-image: url("https://wallpapers.com/images/hd/american-movie-posters-z0puq43u0qbtr6j2.jpg");
+        background-size: cover;
+        background-position: center;
+    }
+
+    .form-login {
+      background: rgb(28, 26, 26);
+      padding: 30px;
+      border-radius: 12px;
+      width: 350px;
+      margin: 180px auto 0;
+      color: white;
+    }

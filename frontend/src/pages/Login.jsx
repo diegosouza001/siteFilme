@@ -40,9 +40,10 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <h1 className="titulo-login">Login</h1>
+      <div className="login-bg">
 
-      <form onSubmit={handleLogin}>
+      <form className="form-login" onSubmit={handleLogin}>
+        <h1 className="titulo-login">Login</h1>
         <input
           className="email-login"
           type="email"
@@ -78,6 +79,7 @@ export default function Login() {
 
         {msg && <p style={{ color: "red" }}>{msg}</p>}
       </form>
+      </div>
     </div>
   );
 }

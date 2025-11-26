@@ -32,9 +32,10 @@ export default function Cadastro() {
 
   return (
     <div className="cadastro-page">
-      <h1 className="titulo-cadastro">Cadastro</h1>
+      <div className="cadastro-bg">
 
-      <form onSubmit={handleRegistro}>
+      <form className="form-cadastro" onSubmit={handleRegistro}>
+        <h1 className="titulo-cadastro">Cadastro</h1>
         <input
           className="nome-cadastro"
           placeholder="Nome"
@@ -69,6 +70,7 @@ export default function Cadastro() {
 
         {msg && <p style={{ color: "red" }}>{msg}</p>}
       </form>
+      </div>
     </div>
   );
 }
