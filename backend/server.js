@@ -3,38 +3,188 @@ console.log("DEBUG .env =>", process.env);
 
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const { Pool } = require("pg"); 
 
+// Variáveis de ambiente
+const TMDB_KEY = process.env.TMDB_API_KEY;
+const GROQ_KEY = process.env.GROQ_API_KEY;
+const JWT_SECRET = process.env.JWT_SECRET || "your-strong-jwt-secret-key"; 
+const POSTGRES_URL = process.env.POSTGRES_URL; 
+
+// ---------------------------
+// 1. CONFIGURAÇÃO DO BANCO DE DADOS
+// ---------------------------
+
+console.log("DEBUG: POSTGRES_URL sendo usada:", POSTGRES_URL ? "Definida" : "NÃO DEFINIDA"); 
+
+// Lógica de verificação para saber se a URL é local ou de produção
+const isLocalhost = POSTGRES_URL && (POSTGRES_URL.includes("localhost") || POSTGRES_URL.includes("127.0.0.1"));
+
+const db = new Pool({
+  connectionString: POSTGRES_URL,
+  // Desativa o SSL se a conexão for local para evitar o erro "server does not support SSL"
+  ssl: isLocalhost ? false : { rejectUnauthorized: false } 
+});
+
+// Função para garantir que a tabela de usuários existe
+async function ensureUsersTableExists() {
+  try {
+    // Tenta obter uma conexão simples para verificar se a Pool está funcionando
+    await db.query("SELECT 1 + 1 AS result"); 
+    console.log("Conexão com o PostgreSQL bem-sucedida.");
+    
+    // CORRIGIDO: Usando o nome correto da sua tabela: usuarios
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id SERIAL PRIMARY KEY,
+        nome VARCHAR(100) NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        senha VARCHAR(200) NOT NULL,
+        criado_em TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
+      );
+    `);
+    console.log("Tabela 'usuarios' verificada/criada com sucesso.");
+  } catch (err) {
+    console.error("ERRO FATAL: Falha ao inicializar o banco de dados. Motivo:", err.message);
+  }
+}
+
+// Inicializa o banco de dados antes de iniciar o servidor
+ensureUsersTableExists();
+
+// ---------------------------
+// 2. CONFIGURAÇÃO DO EXPRESS
+// ---------------------------
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const TMDB_KEY = process.env.TMDB_API_KEY;
-const GROQ_KEY = process.env.GROQ_API_KEY;
-
-console.log("TMDB_KEY carregada (backend):", TMDB_KEY);
-console.log("GROQ_KEY carregada (backend):", GROQ_KEY);
+console.log("TMDB_KEY carregada (backend):", TMDB_KEY ? "Sim" : "Não");
+console.log("GROQ_KEY carregada (backend):", GROQ_KEY ? "Sim" : "Não");
 
 // ---------------------------
-// ROTA: BUSCAR FILME NA TMDB
+// 3. MIDDLEWARE DE AUTENTICAÇÃO JWT
 // ---------------------------
-app.get("/filme", async (req, res) => {
-  const titulo = req.query.titulo;
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
-  if (!titulo) {
-    return res.status(400).json({ erro: "Título não informado" });
+  if (token == null) {
+    return res.status(401).json({ erro: "Acesso negado. Token não fornecido." });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      console.error("JWT Verification Error:", err.message);
+      return res.status(403).json({ erro: "Token inválido ou expirado." });
+    }
+    req.user = user; 
+    next();
+  });
+}
+
+// ---------------------------
+// 4. ROTAS DE AUTENTICAÇÃO
+// ---------------------------
+
+// ROTA: REGISTRO
+app.post("/auth/register", async (req, res) => {
+  const { nome, email, password } = req.body; 
+
+  if (!nome || !email || !password) {
+    return res.status(400).json({ erro: "Nome, e-mail e senha são obrigatórios." });
   }
 
   try {
-    console.log("Buscando filme:", titulo);
+    // 1. Verificar se o e-mail já existe (QUERY CORRIGIDA: usa 'usuarios')
+    const existingUser = await db.query("SELECT * FROM usuarios WHERE email = $1", [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ erro: "Este e-mail já está cadastrado." });
+    }
 
+    // 2. Hash da senha
+    const saltRounds = 10;
+    const senha_hash = await bcrypt.hash(password, saltRounds);
+    console.log(`DEBUG: Hash de senha gerado para ${email}.`); 
+
+    // 3. Inserir novo usuário (QUERY CORRIGIDA: usa 'usuarios')
+    const result = await db.query(
+      "INSERT INTO usuarios (nome, email, senha) VALUES ($1, $2, $3) RETURNING id, nome, email",
+      [nome, email, senha_hash]
+    );
+
+    const user = result.rows[0];
+    
+    // 4. Gerar JWT
+    const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+
+    console.log(`DEBUG: Usuário ${user.nome} (${user.email}) registado com ID ${user.id}.`);
+    // O frontend espera 'username', então mapeamos 'nome' para 'username' na resposta
+    res.status(201).json({ token, username: user.nome, message: "Utilizador registado com sucesso." });
+  } catch (err) {
+    console.error("ERRO CRÍTICO NO REGISTRO:", err.message, err.stack); 
+    res.status(500).json({ erro: "Erro interno ao registar utilizador. Verifique o console do backend." });
+  }
+});
+
+// ROTA: LOGIN
+app.post("/auth/login", async (req, res) => {
+  const { email, password } = req.body; 
+
+  if (!email || !password) {
+    return res.status(400).json({ erro: "E-mail e palavra-passe são obrigatórios." });
+  }
+
+  try {
+    // 1. Buscar usuário pelo E-mail (QUERY CORRIGIDA: usa 'usuarios')
+    const result = await db.query("SELECT * FROM usuarios WHERE email = $1", [email]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ erro: "Credenciais inválidas." });
+    }
+
+    const user = result.rows[0];
+
+    // 2. Comparar senha (usando a coluna 'senha' do banco)
+    const isMatch = await bcrypt.compare(password, user.senha);
+    if (!isMatch) {
+      return res.status(401).json({ erro: "Credenciais inválidas." });
+    }
+
+    // 3. Gerar JWT
+    const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+
+    // O frontend espera 'username', então mapeamos 'nome' para 'username' na resposta
+    res.json({ token, username: user.nome, message: "Login efetuado com sucesso." });
+  } catch (err) {
+    console.error("Erro no login:", err);
+    res.status(500).json({ erro: "Erro interno ao fazer login." });
+  }
+});
+
+
+// ---------------------------
+// 5. ROTAS PROTEGIDAS 
+// ---------------------------
+
+// ROTA: BUSCAR FILME NA TMDB - AGORA PROTEGIDA
+app.get("/filme", authenticateToken, async (req, res) => {
+  const titulo = req.query.titulo;
+  
+  console.log(`Utilizador ${req.user.nome} a procurar filme: ${titulo}`);
+
+  if (!titulo) {
+    return res.status(400).json({ erro: "Título não fornecido" });
+  }
+
+  try {
     const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
       titulo
     )}&language=pt-BR&api_key=${TMDB_KEY}`;
 
     const resp = await fetch(url);
     const json = await resp.json();
-
-    console.log("Resposta TMDB:", json);
 
     if (!json.results || json.results.length === 0) {
       return res.status(404).json({ erro: "Filme não encontrado" });
@@ -44,31 +194,29 @@ app.get("/filme", async (req, res) => {
     return res.json(filme);
   } catch (err) {
     console.error("Erro TMDB:", err);
-    return res.status(500).json({ erro: "Erro interno ao buscar filme" });
+    return res.status(500).json({ erro: "Erro interno ao procurar filme" });
   }
 });
 
-// ---------------------------
-// IA - USANDO GROQ
-// ---------------------------
-app.post("/api/chat", async (req, res) => {
+// IA - USANDO GROQ - AGORA PROTEGIDA
+app.post("/api/chat", authenticateToken, async (req, res) => {
   const { pergunta, filme } = req.body;
+
+  console.log(`Utilizador ${req.user.nome} a consultar IA sobre: ${filme.title}`);
 
   try {
     const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // CORRIGIDO: Uso de crases para Template Literal
         Authorization: `Bearer ${GROQ_KEY}`, 
       },
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
         messages: [
-          { role: "system", content: "Você é um assistente que resume filmes." },
+          { role: "system", content: "É um assistente que resume filmes." },
           {
             role: "user",
-            // CORRIGIDO: Uso de crases para Template Literal
             content: `${pergunta}\n\nFilme: ${filme.title}\nDescrição: ${filme.overview}`,
           },
         ],
@@ -76,10 +224,8 @@ app.post("/api/chat", async (req, res) => {
     });
 
     const data = await groqRes.json();
-    console.log("Resposta GROQ:", data);
 
     if (!data.choices) {
-      // Adicionado um log para depuração caso a IA retorne um erro sem 'choices'
       console.error("GROQ API Error:", data); 
       return res.status(500).json({ resposta: "Erro ao gerar resposta pela IA (GROQ)." });
     }
@@ -93,4 +239,4 @@ app.post("/api/chat", async (req, res) => {
 });
 
 // ---------------------------
-app.listen(3001, () => console.log("Backend rodando na porta 3001"));
+app.listen(3001, () => console.log("Backend a correr na porta 3001"));
