@@ -1,10 +1,5 @@
-export const getToken = () => localStorage.getItem("token");
-
-export const setToken = (token) => {
-  localStorage.setItem("token", token);
-};
-
-export const logout = () => {
+export function logout() {
   localStorage.removeItem("token");
+  localStorage.removeItem("username");
   window.location.href = "/login";
-};
+}

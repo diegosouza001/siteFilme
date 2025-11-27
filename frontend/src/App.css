@@ -458,7 +458,7 @@
      }
 
      .form-cadastro {
-      background: rgb(28, 26, 26);
+      background: rgb(0, 0, 0, 0.85);
       padding: 30px;
       border-radius: 12px;
       width: 350px;
@@ -476,10 +476,28 @@
     }
 
     .form-login {
-      background: rgb(28, 26, 26);
+      background: rgb(0, 0, 0, 0.85);
       padding: 30px;
       border-radius: 12px;
       width: 350px;
       margin: 180px auto 0;
       color: white;
     }
+
+    .logoutBtn {
+      width: 200px;
+      padding: 5px;
+      border-radius: 6px;
+      background-color: var(--primary-color);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    .logoutBtn:hover:not(:disabled) {
+          background-color: var(--primary-hover);
+      }
+      .logoutBtn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+      }

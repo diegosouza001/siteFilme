@@ -7,13 +7,13 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { Pool } = require("pg"); 
 
-// Variáveis de ambiente
+
 const TMDB_KEY = process.env.TMDB_API_KEY;
 const GROQ_KEY = process.env.GROQ_API_KEY;
 const JWT_SECRET = process.env.JWT_SECRET || "your-strong-jwt-secret-key"; 
 const POSTGRES_URL = process.env.POSTGRES_URL; 
 
-// NOVAS VARIAVEIS DE CONEXAO
+
 const PG_CONFIG = {
   host: process.env.PG_HOST,
   port: process.env.PG_PORT ? parseInt(process.env.PG_PORT) : 5432,
@@ -23,22 +23,17 @@ const PG_CONFIG = {
 };
 
 
-// ---------------------------
-// 1. CONFIGURAÇÃO DO BANCO DE DADOS
-// ---------------------------
-
 console.log("DEBUG: POSTGRES_URL sendo usada:", POSTGRES_URL ? "Definida" : "NÃO DEFINIDA"); 
 
-// Lógica de verificação para saber se a URL é local ou de produção
-// Usamos a POSTGRES_URL para detecção de localhost se ela estiver definida
+
 const isLocalhost = POSTGRES_URL && (POSTGRES_URL.includes("localhost") || POSTGRES_URL.includes("127.0.0.1"));
 
-// Define as opções de conexão: prioriza POSTGRES_URL se definida, senão usa PG_CONFIG
+
 const connectionOptions = POSTGRES_URL 
   ? { connectionString: POSTGRES_URL }
   : PG_CONFIG;
 
-// Adiciona configuração SSL
+
 connectionOptions.ssl = isLocalhost ? false : { rejectUnauthorized: false };
 
 const db = new Pool(connectionOptions);
@@ -69,9 +64,6 @@ async function ensureUsersTableExists() {
 // Inicializa o banco de dados antes de iniciar o servidor
 ensureUsersTableExists();
 
-// ---------------------------
-// 2. CONFIGURAÇÃO DO EXPRESS
-// ---------------------------
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -100,11 +92,8 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// ---------------------------
-// 4. ROTAS DE AUTENTICAÇÃO
-// ---------------------------
 
-// ROTA: REGISTRO
+
 app.post("/auth/register", async (req, res) => {
   const { nome, email, password } = req.body; 
 
@@ -113,7 +102,6 @@ app.post("/auth/register", async (req, res) => {
   }
 
   try {
-    // 1. Verificar se o e-mail já existe (QUERY CORRIGIDA: usa 'usuarios')
     const existingUser = await db.query("SELECT * FROM usuarios WHERE email = $1", [email]);
     if (existingUser.rows.length > 0) {
       return res.status(409).json({ erro: "Este e-mail já está cadastrado." });
@@ -183,11 +171,7 @@ app.post("/auth/login", async (req, res) => {
 });
 
 
-// ---------------------------
-// 5. ROTAS PROTEGIDAS 
-// ---------------------------
 
-// ROTA: BUSCAR FILME NA TMDB - AGORA PROTEGIDA
 app.get("/filme", authenticateToken, async (req, res) => {
   const titulo = req.query.titulo;
   

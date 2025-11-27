@@ -4,12 +4,14 @@ const api = axios.create({
   baseURL: "http://localhost:3001",
 });
 
-// Anexa automaticamente o token JWT
+// Intercepta todas as requisições e adiciona o token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 

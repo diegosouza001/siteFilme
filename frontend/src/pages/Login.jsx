@@ -62,7 +62,7 @@ export default function Login() {
         <br></br>
         <button 
           className="button-login" 
-          type="button-login"
+          type="submit"
         >
 
             Entrar
