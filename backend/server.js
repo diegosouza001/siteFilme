@@ -38,6 +38,9 @@ connectionOptions.ssl = isLocalhost ? false : { rejectUnauthorized: false };
 
 const db = new Pool(connectionOptions);
 
+
+
+
 // Função para garantir que a tabela de usuários 
 async function ensureUsersTableExists() {
   try {
@@ -242,6 +245,21 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
 });
 
 // ---------------------------
+app.get("/auth/validar", (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
+  if (!token) {
+    return res.json({ valido: false });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.json({ valido: false });
+    }
+
+    return res.json({ valido: true });
+  });
+});
 
 app.listen(3001, () => console.log("Backend a correr na porta 3001"));

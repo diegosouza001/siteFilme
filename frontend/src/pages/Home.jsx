@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import "../App.css";
 import api from "../services/api";
 import { logout } from "../services/auth";
+import { useNavigate } from "react-router-dom";
+import { validarToken } from "../services/validar";
 
 export default function Home() {
   const [titulo, setTitulo] = useState("");
@@ -31,6 +33,25 @@ export default function Home() {
 
   const [indexDestaque, setIndexDestaque] = useState(0);
   const [bgAtual, setBgAtual] = useState("");
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function checar() {
+      const valido = await validarToken();
+      if (!valido) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    }
+
+    checar();
+
+    // Se a pessoa tentar editar o token no navegador
+    window.addEventListener("storage", checar);
+
+    return () => window.removeEventListener("storage", checar);
+  }, [navigate]);
 
   // Precarregar imagem
   useEffect(() => {
