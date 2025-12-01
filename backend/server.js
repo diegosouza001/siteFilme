@@ -69,7 +69,7 @@ ensureUsersTableExists();
 
 const app = express();
 app.use(cors({
-  origin: "https://site-filme-orjl-b7qcx15vk-diegos-projects-bfd38045.vercel.app",
+  origin: "https://site-filme-orjl-mhclm05in-diegos-projects-bfd38045.vercel.app",
   credentials: true,
 }));
 
