@@ -4,15 +4,7 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_BACKEND_URL,
 });
 
-// Intercepta todas as requisições e adiciona o token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+console.log("BACKEND URL:", process.env.REACT_APP_BACKEND_URL);
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
 
 export default api;

@@ -50,6 +50,7 @@ export default function Cadastro() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+
         <br></br>
         <input
           className="senha-cadastro"
@@ -60,6 +61,7 @@ export default function Cadastro() {
         />
         <br></br>
         <button type="submit" className="button-cadastro">Cadastrar</button>
+
         <button
             className="button-cadastro-redirecionar"
             type="button"
@@ -70,7 +72,11 @@ export default function Cadastro() {
 
         {msg && <p style={{ color: "red" }}>{msg}</p>}
       </form>
+
+
       </div>
     </div>
   );
 }
+
+console.log("URL do backend:", process.env.REACT_APP_BACKEND_URL);
