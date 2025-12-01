@@ -68,7 +68,11 @@ async function ensureUsersTableExists() {
 ensureUsersTableExists();
 
 const app = express();
-app.use(cors({ origin: "site-filme-orjl.vercel.app", credentials: true, }));
+app.use(cors({
+  origin: "*",
+  credentials: true,
+}));
+
 app.use(express.json());
 
 console.log("TMDB_KEY carregada (backend):", TMDB_KEY ? "Sim" : "Não");
