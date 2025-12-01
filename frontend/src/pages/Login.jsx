@@ -11,9 +11,7 @@ export default function Login() {
   const [senha, setSenha] = useState("");
   const [msg, setMsg] = useState("");
 
-  function onClick() {
 
-  }
 
 
   async function handleLogin(e) {
