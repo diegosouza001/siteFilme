@@ -11,7 +11,7 @@ export default function Cadastro() {
   async function handleRegistro(e) {
     e.preventDefault();
 
-    const resp = await fetch("http://https://sitefilme-1.onrender.com/auth/register", {
+    const resp = await fetch("https://sitefilme-1.onrender.com/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
