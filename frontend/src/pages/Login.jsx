@@ -31,8 +31,8 @@ export default function Login() {
     const data = await resp.json();
 
     if (resp.ok) {
-      login(data.token);      // salva o token no contexto
-      navigate("/home");      // redireciona
+      login(data.token);      
+      navigate("/home");      
     } else {
       setMsg(data.erro || "E-mail ou senha inválidos");
     }
