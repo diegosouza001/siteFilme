@@ -69,9 +69,17 @@ ensureUsersTableExists();
 
 const app = express();
 app.use(cors({
-  origin: "https://site-filme-orjl-mhclm05in-diegos-projects-bfd38045.vercel.app",
-  credentials: true,
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true);
+    if(origin.includes("vercel.app") || origin.includes("localhost")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Acesso negado pelo CORS"), false);
+    }
+  },
+  credentials: true
 }));
+
 
 
 app.use(express.json());
