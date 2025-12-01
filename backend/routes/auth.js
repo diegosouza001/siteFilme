@@ -18,7 +18,7 @@ router.post("/register", async (req, res) => {
       "INSERT INTO usuarios (nome, email, senha) VALUES ($1, $2, $3) RETURNING id, nome, email",
       [nome, email, hashedSenha]
     );
-    const token = jwt.sign({ id: result.rows[0].id, email }, process.env.JWT_SECRET, { expiresIn: "30" });
+    const token = jwt.sign({ id: result.rows[0].id, email }, process.env.JWT_SECRET, { expiresIn: "1h" });
     res.json({ usuario: result.rows[0], token });
   } catch (err) {
     console.error(err);
