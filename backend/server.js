@@ -68,18 +68,31 @@ async function ensureUsersTableExists() {
 ensureUsersTableExists();
 
 const app = express();
+// A URL EXATA do seu frontend deployado na Vercel
+const allowedOrigins = [
+    'https://site-filme-orjl-l5gwuooqb-diegos-projects-bfd38045.vercel.app', 
+    'http://localhost:3000', // Para testes locais do frontend (se for porta 3000)
+    'http://localhost:5173'  // Para testes locais do frontend (se for porta 5173/Vite)
+];
+
 app.use(cors({
-  origin: function(origin, callback){
-    if(!origin) return callback(null, true);
-    if(origin.includes("vercel.app") || origin.includes("localhost")) {
-      callback(null, true);
-    } else {
-      callback(new Error("Acesso negado pelo CORS"), false);
-    }
-  },
-  credentials: true
+    origin: function (origin, callback) {
+        // Permite requisições sem 'origin' (como apps mobile ou tools REST)
+        if (!origin) return callback(null, true); 
+        
+        // Verifica se a origem está na lista de permissões
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true); // Permite
+        } else {
+            // Log de erro para saber quem está tentando acessar
+            console.error(`CORS Blocked: Origin ${origin} not allowed.`); 
+            callback(new Error('Acesso negado pelo CORS'), false); // Bloqueia
+        }
+    },
+    credentials: true
 }));
 
+// ... (Resto do seu código backend)
 
 
 app.use(express.json());
