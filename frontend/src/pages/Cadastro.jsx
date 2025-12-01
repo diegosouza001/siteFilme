@@ -11,15 +11,15 @@ export default function Cadastro() {
   async function handleRegistro(e) {
     e.preventDefault();
 
-    const resp = await fetch("https://sitefilme-1.onrender.com/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nome,
-        email,
-        password: senha,   // 🔥 CORREÇÃO IMPORTANTE
-      }),
-    });
+    const resp = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/register`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    nome,
+    email,
+    password: senha,
+  }),
+});
 
     const data = await resp.json();
 
