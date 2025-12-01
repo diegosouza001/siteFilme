@@ -76,7 +76,7 @@ const allowedOrigins = [
     
     // Antiga URL da Vercel (se ainda estiver em uso para algum ambiente)
     'https://site-filme-orjl-pm718pvjs-diegos-projects-bfd38045.vercel.app', 
-    'https://sitefilmetrabalho-2d1gz0d0i-diegos-projects-bfd38045.vercel.app/login',
+    'https://sitefilmetrabalho-2d1gz0d0i-diegos-projects-bfd38045.vercel.app',
     
     // Localhost para desenvolvimento
     'http://localhost:3000', 
