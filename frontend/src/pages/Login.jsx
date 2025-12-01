@@ -19,7 +19,7 @@ export default function Login() {
   async function handleLogin(e) {
     e.preventDefault();
 
-      const resp = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {
+      const resp = await fetch(`https://sitefilme-1.onrender.com/auth/login`, {
    method: "POST",
    headers: { "Content-Type": "application/json" },
    body: JSON.stringify({
